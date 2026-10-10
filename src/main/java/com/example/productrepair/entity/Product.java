@@ -1,6 +1,7 @@
 package com.example.productrepair.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 
 @Entity
@@ -25,6 +26,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"password", "phone", "address", "email"})
     private User user;
 
     public Product() {

@@ -1,6 +1,7 @@
 package com.example.productrepair.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDate;
 
@@ -18,11 +19,20 @@ public class Repair {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonIgnoreProperties({"password", "phone", "address", "email"})
     private User customer;
 
+    @Column(length = 120)
     private String issue;
 
+    @Column(length = 2000)
     private String description;
+
+    @Column(length = 1000)
+    private String serviceAddress;
+
+    @Column(length = 16)
+    private String preferredContactMethod;
 
     private LocalDate requestDate;
 
@@ -31,6 +41,7 @@ public class Repair {
 
     @ManyToOne
     @JoinColumn(name = "technician_id")
+    @JsonIgnoreProperties({"password", "phone", "address", "email"})
     private User technician;
 
     public Repair() {
@@ -74,6 +85,22 @@ public class Repair {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getServiceAddress() {
+        return serviceAddress;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
+    public String getPreferredContactMethod() {
+        return preferredContactMethod;
+    }
+
+    public void setPreferredContactMethod(String preferredContactMethod) {
+        this.preferredContactMethod = preferredContactMethod;
     }
 
     public LocalDate getRequestDate() {
