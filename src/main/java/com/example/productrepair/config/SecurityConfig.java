@@ -1,7 +1,7 @@
-
 package com.example.productrepair.config;
 
 import com.example.productrepair.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,12 +17,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -31,17 +31,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
             .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/auth/register", "/auth/apply", "/auth/login",
-                        "/auth/application-status").permitAll()
-                .requestMatchers("/technician-applications/**", "/repairs/admin/**",
-                        "/users/**", "/products/all").hasRole("ADMIN")
+                .requestMatchers(
+                    "/auth/register",
+                    "/auth/apply",
+                    "/auth/login",
+                    "/auth/application-status"
+                ).permitAll()
+                .requestMatchers(
+                    "/technician-applications/**",
+                    "/repairs/admin/**",
+                    "/users/**",
+                    "/products/all"
+                ).hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exceptions -> exceptions
@@ -50,7 +58,11 @@ public class SecurityConfig {
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable());
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+            jwtAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class
+        );
+
         return http.build();
     }
 
@@ -59,7 +71,9 @@ public class SecurityConfig {
         return (request, response, exception) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            response.getWriter().write("{\"message\":\"Authentication is required. Please sign in.\"}");
+            response.getWriter().write(
+                "{\"message\":\"Authentication is required. Please sign in.\"}"
+            );
         };
     }
 
@@ -68,7 +82,9 @@ public class SecurityConfig {
         return (request, response, exception) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
-            response.getWriter().write("{\"message\":\"You are not authorized to perform this action.\"}");
+            response.getWriter().write(
+                "{\"message\":\"You are not authorized to perform this action.\"}"
+            );
         };
     }
 
@@ -80,12 +96,27 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Content-Type", "X-Requested-With", "Authorization"));
+
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:5173",
+            "https://tiny-selkie-8e90c3.netlify.app"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(List.of(
+            "Content-Type", "X-Requested-With", "Authorization"
+        ));
+
         configuration.setAllowCredentials(false);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }
